@@ -1,70 +1,135 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, ScrollView, Image, Platform } from 'react-native';
+import { Link } from 'expo-router';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-
-export default function HomeScreen() {
+export default function Index() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={Platform.OS === 'web' ? styles.webBackground : styles.background}>
+      {Platform.OS !== 'web' && (
+        <ImageBackground source={require('@/assets/images/splash.png')} style={styles.background}>
+          <ScrollView contentContainerStyle={styles.container}>
+            <View style={styles.logoContainer}>
+              <Text style={styles.description}>
+                Al presionar “Registrarse” o “Iniciar sesión” aceptas nuestros{' '}
+                <Text style={styles.link} onPress={() => {}}>Términos</Text>. Para más información vea nuestra{' '}
+                <Text style={styles.link} onPress={() => {}}>Política de privacidad</Text> y{' '}
+                <Text style={styles.link} onPress={() => {}}>Política de cookies</Text>.
+              </Text>
+              <TouchableOpacity style={styles.button} onPress={() => {}}>
+                <Text style={styles.buttonText}>Registrarse</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={() => {}}>
+                <Text style={styles.buttonText}>Iniciar sesión</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </ImageBackground>
+      )}
+      {Platform.OS === 'web' && (
+        <View style={styles.webContainer}>
+          <Text style={styles.titleWeb}>WooFriends</Text>
+          <Image source={require('@/assets/images/logo.png')} style={styles.logoWeb} />
+          <View style={styles.contentWeb}>
+            <Text style={styles.description}>
+              Al presionar “Registrarse” o “Iniciar sesión” aceptas nuestros{' '}
+              <Text style={styles.link} onPress={() => {}}>Términos</Text>. Para más información vea nuestra{' '}
+              <Text style={styles.link} onPress={() => {}}>Política de privacidad</Text> y{' '}
+              <Text style={styles.link} onPress={() => {}}>Política de cookies</Text>.
+            </Text>
+            <TouchableOpacity style={styles.button} onPress={() => {}}>
+              <Text style={styles.buttonText}>Registrarse</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={() => {}}>
+              <Text style={styles.buttonText}>Iniciar sesión</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  background: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  webBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5EFE4', // Color de fondo para la versión web
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingVertical: 50,
+  },
+  logoContainer: {
+    alignItems: 'center',
+  },
+  logoContainerWeb: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contentWeb: {
+    alignItems: 'center',
+    paddingBottom: 50,
+    marginTop: 50, // Espacio adicional para separar el logo del contenido
+  },
+  description: {
+    fontSize: 12,
+    color: '#000',
+    textAlign: 'center',
+    marginHorizontal: 20,
+    marginBottom: 20,
+    ...(Platform.OS === 'web' && {
+      textAlign: 'left',
+      marginHorizontal: 0,
+    }),
+  },
+  link: {
+    color: '#0a7ea4',
+    textDecorationLine: 'underline',
+    ...(Platform.OS === 'web' && {
+      cursor: 'pointer', // Añadir cursor pointer para hover en web
+    }),
+  },
+  button: {
+    backgroundColor: '#000',
+    borderRadius: 25,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    marginBottom: 10,
+    width: 200,
+    alignItems: 'center',
+    ...(Platform.OS === 'web' && {
+      marginHorizontal: 10,
+      cursor: 'pointer', // Añadir cursor pointer para hover en web
+      transition: 'background-color 0.3s', // Efecto de transición para hover
+    }),
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  logoWeb: {
+    width: 300,
+    height: 300,
+    resizeMode: 'contain',
+    marginBottom: 20,
+  },
+  webContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  titleWeb: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
 });
