@@ -9,8 +9,6 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { useColorScheme } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 
 const { height } = Dimensions.get('window');
 const CARD_WIDTH = 350;
@@ -55,20 +53,6 @@ export default function SwipeTab() {
     runOnJS(resetCardPosition)();
   };
 
-  const addFavoriteDog = async (dogId) => {
-    const userId = await AsyncStorage.getItem('userId');
-    if (userId) {
-      try {
-        await axios.post('http://192.168.0.6:3000/favorite', {
-          userId,
-          dogId,
-        });
-      } catch (error) {
-        console.error('Error adding favorite:', error);
-      }
-    }
-  };
-
   const panGestureEvent = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
     onActive: (event) => {
       translateX.value = event.translationX;
@@ -76,9 +60,6 @@ export default function SwipeTab() {
     },
     onEnd: () => {
       if (Math.abs(translateX.value) > SWIPE_THRESHOLD) {
-        if (translateX.value > 0) {
-          runOnJS(addFavoriteDog)(dogs[currentDogIndex].id);
-        }
         runOnJS(updateDogIndex)();
       } else {
         translateX.value = withSpring(0);
