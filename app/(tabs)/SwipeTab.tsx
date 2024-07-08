@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Image, ScrollView, Dimensions } from 'react-native';
 import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import Animated, {
@@ -14,46 +14,37 @@ const { height } = Dimensions.get('window');
 const CARD_WIDTH = 350;
 const CARD_HEIGHT = 500;
 const SWIPE_THRESHOLD = 120;
-const INDICATOR_THRESHOLD = 20;  // Haciendo los indicadores más sensibles
+const OPACITY_THRESHOLD = 40;  // Nuevo umbral para opacidad
 
-const dogs = [
-  {
-    image: require('@/assets/images/perro.png'),
-    name: 'Fantasma',
-    sexo: 'Hembra',
-    edad: 10,
-    tamaño: 'Grande',
-    personalidad: 'Sociable-Juguetona',
-    esterilizado: 'Sí',
-    vacunas: 'No',
-    espacio: 'Patio',
-    relacion: 'Ninguna',
-  },
-  {
-    image: require('@/assets/images/perro2.png'),
-    name: 'Nico',
-    sexo: 'Macho',
-    edad: 12,
-    tamaño: 'Grande',
-    personalidad: 'Sociable-Tranquilo',
-    esterilizado: 'Sí',
-    vacunas: 'Sí',
-    espacio: 'Patio Grande',
-    relacion: 'Chispita',
-  },
-];
+const fetchDogs = async () => {
+  try {
+    const response = await fetch('http://192.168.0.6:3000/dogs');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return [];
+  }
+};
 
 export default function SwipeTab() {
+  const [dogs, setDogs] = useState([]);
   const [currentDogIndex, setCurrentDogIndex] = useState(0);
   const colorScheme = useColorScheme();
   const translateX = useSharedValue(0);
   const rotateZ = useSharedValue(0);
-  const showIndicators = useSharedValue(false);
+
+  useEffect(() => {
+    const loadDogs = async () => {
+      const fetchedDogs = await fetchDogs();
+      setDogs(fetchedDogs);
+    };
+    loadDogs();
+  }, []);
 
   const resetCardPosition = () => {
     translateX.value = withSpring(0);
     rotateZ.value = withSpring(0);
-    showIndicators.value = false;
   };
 
   const updateDogIndex = () => {
@@ -63,9 +54,6 @@ export default function SwipeTab() {
   };
 
   const panGestureEvent = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
-    onStart: () => {
-      showIndicators.value = true;
-    },
     onActive: (event) => {
       translateX.value = event.translationX;
       rotateZ.value = event.translationX / 20;
@@ -77,7 +65,6 @@ export default function SwipeTab() {
         translateX.value = withSpring(0);
         rotateZ.value = withSpring(0);
       }
-      showIndicators.value = false;
     },
   });
 
@@ -89,12 +76,20 @@ export default function SwipeTab() {
   }));
 
   const leftIndicatorStyle = useAnimatedStyle(() => ({
-    opacity: showIndicators.value && translateX.value < -INDICATOR_THRESHOLD ? Math.min(Math.abs(translateX.value) / SWIPE_THRESHOLD, 1) : 0,
+    opacity: translateX.value < -OPACITY_THRESHOLD ? 1 : 0,
   }));
 
   const rightIndicatorStyle = useAnimatedStyle(() => ({
-    opacity: showIndicators.value && translateX.value > INDICATOR_THRESHOLD ? Math.min(translateX.value / SWIPE_THRESHOLD, 1) : 0,
+    opacity: translateX.value > OPACITY_THRESHOLD ? 1 : 0,
   }));
+
+  if (dogs.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text>No dogs available.</Text>
+      </View>
+    );
+  }
 
   const currentDog = dogs[currentDogIndex];
 
@@ -103,7 +98,7 @@ export default function SwipeTab() {
       <View style={styles.container}>
         <PanGestureHandler onGestureEvent={panGestureEvent}>
           <Animated.View style={[styles.card, cardStyle]}>
-            <Image source={currentDog.image} style={styles.image} />
+            <Image source={{ uri: currentDog.image_path }} style={styles.image} />
             <Animated.View style={[styles.indicator, styles.indicatorLeft, leftIndicatorStyle]}>
               <Text style={styles.indicatorText}>X</Text>
             </Animated.View>
@@ -114,31 +109,43 @@ export default function SwipeTab() {
         </PanGestureHandler>
         <View style={styles.infoContainer}>
           <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
-            <Text style={styles.infoLabel}>Nombre:</Text> {currentDog.name}
+            <Text style={styles.infoLabel}>Nombre:</Text> {currentDog.nombre}.
           </Text>
           <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
-            <Text style={styles.infoLabel}>Sexo:</Text> {currentDog.sexo}
+            <Text style={styles.infoLabel}>Sexo:</Text> {currentDog.sexo}.
           </Text>
           <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
-            <Text style={styles.infoLabel}>Edad:</Text> {currentDog.edad}
+            <Text style={styles.infoLabel}>Edad:</Text> {currentDog.edad}.
           </Text>
           <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
-            <Text style={styles.infoLabel}>Tamaño:</Text> {currentDog.tamaño}
+            <Text style={styles.infoLabel}>Colores:</Text> {currentDog.colors}.
           </Text>
           <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
-            <Text style={styles.infoLabel}>Personalidad:</Text> {currentDog.personalidad}
+            <Text style={styles.infoLabel}>Tipo:</Text> {currentDog.tipo}.
           </Text>
           <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
-            <Text style={styles.infoLabel}>Esterilizado:</Text> {currentDog.esterilizado}
+            <Text style={styles.infoLabel}>Personalidad con personas:</Text> {currentDog.personalidad_personas}
           </Text>
           <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
-            <Text style={styles.infoLabel}>Vacunas:</Text> {currentDog.vacunas}
+            <Text style={styles.infoLabel}>Carácter:</Text> {currentDog.carácter}.
           </Text>
           <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
-            <Text style={styles.infoLabel}>Espacio:</Text> {currentDog.espacio}
+            <Text style={styles.infoLabel}>Nivel de energía:</Text> {currentDog.nivel_energia}.
           </Text>
           <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
-            <Text style={styles.infoLabel}>Relación:</Text> {currentDog.relacion}
+            <Text style={styles.infoLabel}>Esterilizado:</Text> {currentDog.esterilizado}.
+          </Text>
+          <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
+            <Text style={styles.infoLabel}>Vacunas:</Text> {currentDog.vacunas}.
+          </Text>
+          <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
+            <Text style={styles.infoLabel}>Personalidad con otros perros:</Text> {currentDog.personalidad_perros}.
+          </Text>
+          <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
+            <Text style={styles.infoLabel}>Tamaño:</Text> {currentDog.tamaño}.
+          </Text>
+          <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
+            <Text style={styles.infoLabel}>Relación:</Text> {currentDog.relacion}.
           </Text>
         </View>
       </View>
@@ -169,7 +176,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
     marginBottom: 20,
-    marginTop: 50,
+    marginTop: 100,
   },
   image: {
     width: '100%',
@@ -206,4 +213,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-

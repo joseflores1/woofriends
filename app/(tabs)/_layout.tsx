@@ -28,7 +28,16 @@ export default function TabLayout() {
         options={{
           title: 'Swipe',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'heart' : 'heart-outline'} color={color} />
+            <TabBarIcon name={focused ? 'swap-horizontal' : 'swap-horizontal-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="SearchTab"
+        options={{
+          title: 'Search',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'search' : 'search-outline'} color={color} />
           ),
         }}
       />
