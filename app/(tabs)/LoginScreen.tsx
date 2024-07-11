@@ -21,7 +21,7 @@ export default function LoginScreen() {
       if (response.status === 200) {
         setMessage('Login successful');
         setUser(response.data.user); // Almacena el usuario en el contexto de autenticación
-        navigation.navigate('SearchTab');
+        navigation.navigate('SwipeTab'); // Cambia a la pestaña de Swipe
       } else {
         setMessage('Hubo un problema al iniciar sesión');
       }

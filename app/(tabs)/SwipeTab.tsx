@@ -9,6 +9,8 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { useColorScheme } from 'react-native';
+import axios from 'axios';
+import { useAuth } from '@/context/AuthContext';
 
 const { height } = Dimensions.get('window');
 const CARD_WIDTH = 350;
@@ -16,11 +18,10 @@ const CARD_HEIGHT = 500;
 const SWIPE_THRESHOLD = 120;
 const OPACITY_THRESHOLD = 40;  // Nuevo umbral para opacidad
 
-const fetchDogs = async () => {
+const fetchDogs = async (userId) => {
   try {
-    const response = await fetch('http://192.168.0.6:3000/dogs');
-    const data = await response.json();
-    return data;
+    const response = await axios.get(`http://192.168.0.6:3000/dogs/${userId}`);
+    return response.data;
   } catch (error) {
     console.error('Error fetching data:', error);
     return [];
@@ -31,18 +32,20 @@ export default function SwipeTab() {
   const [dogs, setDogs] = useState([]);
   const [currentDogIndex, setCurrentDogIndex] = useState(0);
   const colorScheme = useColorScheme();
+  const { user } = useAuth();  // Obtener el usuario autenticado
   const translateX = useSharedValue(0);
   const rotateZ = useSharedValue(0);
 
   useEffect(() => {
     const loadDogs = async () => {
-      const fetchedDogs = await fetchDogs();
+      const fetchedDogs = await fetchDogs(user?.id);
       setDogs(fetchedDogs);
     };
     loadDogs();
-  }, []);
+  }, [user]);
 
   const resetCardPosition = () => {
+    'worklet';
     translateX.value = withSpring(0);
     rotateZ.value = withSpring(0);
   };
@@ -50,7 +53,23 @@ export default function SwipeTab() {
   const updateDogIndex = () => {
     const newIndex = (currentDogIndex + 1) % dogs.length;
     setCurrentDogIndex(newIndex);
-    runOnJS(resetCardPosition)();
+    resetCardPosition();
+  };
+
+  const saveFavoriteDog = async (dogId) => {
+    try {
+      await axios.post('http://192.168.0.6:3000/favorites', {
+        userId: user?.id, // Asegúrate de que user.id se envíe correctamente
+        dogId: dogId,
+      });
+      // Filtra el perro recién agregado a favoritos de la lista de perros
+      setDogs((prevDogs) => prevDogs.filter(dog => dog.id !== dogId));
+      // Reinicia el índice del perro actual
+      setCurrentDogIndex(0);
+      resetCardPosition();
+    } catch (error) {
+      console.error('Error saving favorite dog:', error);
+    }
   };
 
   const panGestureEvent = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
@@ -60,7 +79,11 @@ export default function SwipeTab() {
     },
     onEnd: () => {
       if (Math.abs(translateX.value) > SWIPE_THRESHOLD) {
-        runOnJS(updateDogIndex)();
+        if (translateX.value > 0) {
+          runOnJS(saveFavoriteDog)(dogs[currentDogIndex].id);
+        } else {
+          runOnJS(updateDogIndex)();
+        }
       } else {
         translateX.value = withSpring(0);
         rotateZ.value = withSpring(0);

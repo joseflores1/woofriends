@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, FlatList, Image, Modal, TouchableOpacity, useColorScheme } from 'react-native';
 import axios from 'axios';
+import { useAuth } from '@/context/AuthContext';
 
 const FindDogsTab = () => {
   const [dogs, setDogs] = useState([]);
@@ -8,6 +9,7 @@ const FindDogsTab = () => {
   const [filteredDogs, setFilteredDogs] = useState([]);
   const [selectedDog, setSelectedDog] = useState(null);
   const colorScheme = useColorScheme();
+  const { user } = useAuth();  // Obtener el usuario autenticado
 
   useEffect(() => {
     const fetchDogs = async () => {
@@ -20,7 +22,7 @@ const FindDogsTab = () => {
     };
 
     fetchDogs();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (searchTerm === '') {

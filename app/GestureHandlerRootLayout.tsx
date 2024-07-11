@@ -1,13 +1,14 @@
 import React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Stack } from 'expo-router';
+import { Slot } from 'expo-router';
+import { Provider as PaperProvider } from 'react-native-paper';
 
 export default function GestureHandlerRootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
+      <PaperProvider>
+        <Slot />
+      </PaperProvider>
     </GestureHandlerRootView>
   );
 }

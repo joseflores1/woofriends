@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, useColorScheme } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '@/context/AuthContext';
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState('');
@@ -10,6 +11,7 @@ export default function RegisterScreen() {
   const [message, setMessage] = useState('');
   const colorScheme = useColorScheme();
   const navigation = useNavigation();
+  const { setUser } = useAuth();
 
   const handleRegister = async () => {
     try {
@@ -20,7 +22,7 @@ export default function RegisterScreen() {
       });
       if (response.status === 201) {
         setMessage('User registered successfully');
-        // Redirigir al usuario a la pantalla de inicio de sesión después de un registro exitoso
+        setUser(response.data.user); // Almacena el usuario en el contexto de autenticación
         navigation.navigate('LoginScreen');
       } else {
         setMessage('Hubo un problema al registrarse');

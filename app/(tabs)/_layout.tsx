@@ -1,3 +1,4 @@
+// app/(tabs)/_layout.tsx
 import { Tabs } from 'expo-router';
 import React from 'react';
 
@@ -47,6 +48,24 @@ export default function TabLayout() {
           title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'person' : 'person-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="FormTab"
+        options={{
+          title: 'Form',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'clipboard' : 'clipboard-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="MatchTab"
+        options={{
+          title: 'Match',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'heart' : 'heart-outline'} color={color} />
           ),
         }}
       />
