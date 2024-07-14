@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, useColorScheme, Dimensions } from 'react-native';
 import axios from 'axios';
 import { useAuth } from '@/context/AuthContext';
+import { useIsFocused } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.9;
@@ -11,21 +12,26 @@ const MatchTab = () => {
     const { user } = useAuth();
     const [matches, setMatches] = useState([]);
     const colorScheme = useColorScheme();
+    const isFocused = useIsFocused();
+
+    const fetchMatches = async () => {
+        try {
+            const response = await axios.get(`http://192.168.0.6:3000/matches/${user.id}`);
+            setMatches(response.data);
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                setMatches([]);
+            } else {
+                console.error("Error fetching matches", error);
+            }
+        }
+    };
 
     useEffect(() => {
-        const fetchMatches = async () => {
-            try {
-                const response = await axios.get(`http://192.168.0.6:3000/matches/${user.id}`);
-                setMatches(response.data);
-            } catch (error) {
-                console.error('Error fetching matches:', error);
-            }
-        };
-
-        if (user) {
+        if (isFocused) {
             fetchMatches();
         }
-    }, [user]);
+    }, [isFocused]);
 
     const handleImageError = (error) => {
         console.error('Error loading image:', error.nativeEvent.error);

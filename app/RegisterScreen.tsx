@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, useColorScheme } from 'react-native';
 import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState('');
@@ -10,7 +11,7 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const colorScheme = useColorScheme();
-  const navigation = useNavigation();
+  const router = useRouter();
   const { setUser } = useAuth();
 
   const handleRegister = async () => {
@@ -23,7 +24,7 @@ export default function RegisterScreen() {
       if (response.status === 201) {
         setMessage('User registered successfully');
         setUser(response.data.user); // Almacena el usuario en el contexto de autenticación
-        navigation.navigate('LoginScreen');
+        router.push('/LoginScreen');
       } else {
         setMessage('Hubo un problema al registrarse');
       }
@@ -35,6 +36,9 @@ export default function RegisterScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colorScheme === 'dark' ? '#000' : '#fff' }]}>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.push('/')}>
+        <Ionicons name="arrow-back" size={24} color={colorScheme === 'dark' ? '#fff' : '#000'} />
+      </TouchableOpacity>
       <TextInput
         style={[styles.input, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}
         placeholder="Username"
@@ -72,6 +76,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
   },
   input: {
     width: '100%',

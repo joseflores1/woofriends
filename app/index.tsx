@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, ScrollView, Image, Platform } from 'react-native';
-import { Link } from 'expo-router';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { Link, useRouter } from 'expo-router';
 
 export default function Index() {
+  const router = useRouter();
+
   return (
     <View style={Platform.OS === 'web' ? styles.webBackground : styles.background}>
       {Platform.OS !== 'web' && (
@@ -15,10 +17,10 @@ export default function Index() {
                 <Text style={styles.link} onPress={() => {}}>Política de privacidad</Text> y{' '}
                 <Text style={styles.link} onPress={() => {}}>Política de cookies</Text>.
               </Text>
-              <TouchableOpacity style={styles.button} onPress={() => {}}>
+              <TouchableOpacity style={styles.button} onPress={() => router.push('/RegisterScreen')}>
                 <Text style={styles.buttonText}>Registrarse</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.button} onPress={() => {}}>
+              <TouchableOpacity style={styles.button} onPress={() => router.push('/LoginScreen')}>
                 <Text style={styles.buttonText}>Iniciar sesión</Text>
               </TouchableOpacity>
             </View>
@@ -28,7 +30,6 @@ export default function Index() {
       {Platform.OS === 'web' && (
         <View style={styles.webContainer}>
           <Text style={styles.titleWeb}>WooFriends</Text>
-          <Image source={require('@/assets/images/logo.png')} style={styles.logoWeb} />
           <View style={styles.contentWeb}>
             <Text style={styles.description}>
               Al presionar “Registrarse” o “Iniciar sesión” aceptas nuestros{' '}
@@ -36,10 +37,10 @@ export default function Index() {
               <Text style={styles.link} onPress={() => {}}>Política de privacidad</Text> y{' '}
               <Text style={styles.link} onPress={() => {}}>Política de cookies</Text>.
             </Text>
-            <TouchableOpacity style={styles.button} onPress={() => {}}>
+            <TouchableOpacity style={styles.button} onPress={() => router.push('/RegisterScreen')}>
               <Text style={styles.buttonText}>Registrarse</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => {}}>
+            <TouchableOpacity style={styles.button} onPress={() => router.push('/LoginScreen')}>
               <Text style={styles.buttonText}>Iniciar sesión</Text>
             </TouchableOpacity>
           </View>
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5EFE4', // Color de fondo para la versión web
+    backgroundColor: '#F5EFE4',
   },
   container: {
     flex: 1,
@@ -70,15 +71,10 @@ const styles = StyleSheet.create({
   logoContainer: {
     alignItems: 'center',
   },
-  logoContainerWeb: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   contentWeb: {
     alignItems: 'center',
     paddingBottom: 50,
-    marginTop: 50, // Espacio adicional para separar el logo del contenido
+    marginTop: 50,
   },
   description: {
     fontSize: 12,
@@ -95,7 +91,7 @@ const styles = StyleSheet.create({
     color: '#0a7ea4',
     textDecorationLine: 'underline',
     ...(Platform.OS === 'web' && {
-      cursor: 'pointer', // Añadir cursor pointer para hover en web
+      cursor: 'pointer',
     }),
   },
   button: {
@@ -108,19 +104,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...(Platform.OS === 'web' && {
       marginHorizontal: 10,
-      cursor: 'pointer', // Añadir cursor pointer para hover en web
-      transition: 'background-color 0.3s', // Efecto de transición para hover
+      cursor: 'pointer',
+      transition: 'background-color 0.3s',
     }),
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
-  },
-  logoWeb: {
-    width: 300,
-    height: 300,
-    resizeMode: 'contain',
-    marginBottom: 20,
   },
   webContainer: {
     flex: 1,

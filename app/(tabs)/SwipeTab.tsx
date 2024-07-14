@@ -16,7 +16,7 @@ const { height } = Dimensions.get('window');
 const CARD_WIDTH = 350;
 const CARD_HEIGHT = 500;
 const SWIPE_THRESHOLD = 120;
-const OPACITY_THRESHOLD = 40;  // Nuevo umbral para opacidad
+const OPACITY_THRESHOLD = 40;
 
 const fetchDogs = async (userId) => {
   try {
@@ -32,7 +32,7 @@ export default function SwipeTab() {
   const [dogs, setDogs] = useState([]);
   const [currentDogIndex, setCurrentDogIndex] = useState(0);
   const colorScheme = useColorScheme();
-  const { user } = useAuth();  // Obtener el usuario autenticado
+  const { user } = useAuth();
   const translateX = useSharedValue(0);
   const rotateZ = useSharedValue(0);
 
@@ -51,21 +51,17 @@ export default function SwipeTab() {
   };
 
   const updateDogIndex = () => {
-    const newIndex = (currentDogIndex + 1) % dogs.length;
-    setCurrentDogIndex(newIndex);
+    setCurrentDogIndex((prevIndex) => (prevIndex + 1) % dogs.length);
     resetCardPosition();
   };
 
   const saveFavoriteDog = async (dogId) => {
     try {
       await axios.post('http://192.168.0.6:3000/favorites', {
-        userId: user?.id, // Asegúrate de que user.id se envíe correctamente
+        userId: user?.id,
         dogId: dogId,
       });
-      // Filtra el perro recién agregado a favoritos de la lista de perros
-      setDogs((prevDogs) => prevDogs.filter(dog => dog.id !== dogId));
-      // Reinicia el índice del perro actual
-      setCurrentDogIndex(0);
+      setCurrentDogIndex((prevIndex) => (prevIndex + 1) % dogs.length);
       resetCardPosition();
     } catch (error) {
       console.error('Error saving favorite dog:', error);
@@ -130,7 +126,7 @@ export default function SwipeTab() {
             </Animated.View>
           </Animated.View>
         </PanGestureHandler>
-        <View style={styles.infoContainer}>
+        <View style={[styles.infoContainer, { backgroundColor: colorScheme === 'dark' ? '#000' : '#fff' }]}>
           <Text style={[styles.infoText, { color: colorScheme === 'dark' ? '#fff' : '#000' }]}>
             <Text style={styles.infoLabel}>Nombre:</Text> {currentDog.nombre}.
           </Text>
@@ -227,10 +223,13 @@ const styles = StyleSheet.create({
   infoContainer: {
     width: CARD_WIDTH,
     padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
   },
   infoText: {
     fontSize: 16,
     marginVertical: 4,
+    color: '#000',
   },
   infoLabel: {
     fontWeight: 'bold',

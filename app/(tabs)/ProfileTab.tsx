@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, Modal, TouchableOpacity, useColorScheme } from 'react-native';
 import axios from 'axios';
 import { useAuth } from '@/context/AuthContext';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface Dog {
   id: number;
@@ -27,18 +28,20 @@ export default function ProfileTab() {
   const [favoriteDogs, setFavoriteDogs] = useState<Dog[]>([]);
   const [selectedDog, setSelectedDog] = useState<Dog | null>(null);
 
-  useEffect(() => {
-    const fetchFavoriteDogs = async () => {
-      try {
-        const response = await axios.get(`http://192.168.0.6:3000/favorites/${user?.id}`);
-        setFavoriteDogs(response.data);
-      } catch (error) {
-        console.error('Error fetching favorite dogs:', error);
-      }
-    };
+  const fetchFavoriteDogs = async () => {
+    try {
+      const response = await axios.get(`http://192.168.0.6:3000/favorites/${user?.id}`);
+      setFavoriteDogs(response.data);
+    } catch (error) {
+      console.error('Error fetching favorite dogs:', error);
+    }
+  };
 
-    fetchFavoriteDogs();
-  }, [user]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchFavoriteDogs();
+    }, [user])
+  );
 
   const renderDogItem = ({ item }: { item: Dog }) => (
     <TouchableOpacity style={[styles.dogItem, { backgroundColor: colorScheme === 'dark' ? '#333' : '#f5f5f5' }]} onPress={() => setSelectedDog(item)}>

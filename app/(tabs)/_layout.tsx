@@ -16,15 +16,6 @@ export default function TabLayout() {
         headerShown: false,
       }}>
       <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Login',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'log-in' : 'log-in-outline'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="SwipeTab"
         options={{
           title: 'Swipe',
