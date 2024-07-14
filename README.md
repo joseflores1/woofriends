@@ -51,7 +51,7 @@ Join our community of developers creating universal apps.
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
 
-Para iniciar el servidor localizado en la branch llamad backend, simplementar ejectutar el comando:
+### Para iniciar el servidor localizado en la branch llamad backend
 
 ```bash
 node index.js
